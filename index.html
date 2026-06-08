@@ -16,7 +16,7 @@
         .group-item:hover { background: #f0f4f8; border-color: #3498db; }
         .group-item.active { background: #e1eff8; border-color: #3498db; }
         .rssi-badge { background: #2c3e50; color: white; padding: 3px 8px; border-radius: 12px; font-size: 12px; }
-        .header-btn { background: #2ecc71; margin-right: 10px; margin-bottom: 10px; }
+        .header-btn { background: #2ecc71; margin-right: 10px; margin-bottom: 10px; text-align: left; line-height: 1.4; }
         .header-btn:hover { background: #27ae60; }
         .form-group { margin-bottom: 15px; }
         .form-group label { display: block; margin-bottom: 5px; font-weight: bold; font-size: 14px;}
@@ -40,7 +40,7 @@
             <h3 id="selectedGroupLabel">Select a group to view</h3>
             
             <div id="headersContainer" style="display: none;">
-                <p style="font-size: 14px; font-weight: bold;">Captured Headers:</p>
+                <p style="font-size: 14px; font-weight: bold;">Captured Packets:</p>
                 <div id="headersList"></div>
             </div>
 
@@ -182,26 +182,36 @@
                 const headersList = document.getElementById("headersList");
                 headersList.innerHTML = "";
                 
-                const headers = new Set();
-                for (const msg of this.groups[grp].messages) {
-                    const header = msg.split(":")[0];
-                    headers.add(header);
-                }
+                // Show every unique captured message and its value
+                const uniqueMessages = Array.from(this.groups[grp].messages);
                 
-                headers.forEach(h => {
+                uniqueMessages.forEach(msg => {
+                    const parts = msg.split(":");
+                    const header = parts[0];
+                    const value = parts.slice(1).join(":"); // Rejoin the rest in case there are extra colons
+                    
                     const btn = document.createElement("button");
                     btn.className = "btn header-btn";
-                    btn.innerText = h;
-                    btn.onclick = () => this.selectHeader(h);
+                    
+                    if (value !== "") {
+                        btn.innerHTML = `<strong>Name:</strong> ${header}<br><small>Value: ${value}</small>`;
+                    } else {
+                        btn.innerHTML = `<strong>String:</strong> ${header}`;
+                    }
+                    
+                    btn.onclick = () => this.selectHeader(header, value);
                     headersList.appendChild(btn);
                 });
             }
 
-            selectHeader(header) {
+            selectHeader(header, value) {
                 this.currentHeader = header;
                 document.getElementById("selectedHeaderLabel").innerText = `Targeting Protocol: ${header}`;
-                document.getElementById("cmdValue").value = "";
+                
+                // Auto-fill the captured value for convenience
+                document.getElementById("cmdValue").value = value || "";
                 document.getElementById("cmdDuration").value = "-1";
+                
                 document.getElementById("sendForm").style.display = "block";
             }
 
