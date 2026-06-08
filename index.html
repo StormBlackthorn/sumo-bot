@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Sumo Bot Radio Scanner</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #f4f4f9; color: #333; margin: 0; padding: 20px; }
+        h1 { text-align: center; color: #2c3e50; }
+        .container { display: flex; gap: 20px; max-width: 900px; margin: 0 auto; }
+        .panel { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); flex: 1; min-height: 400px; }
+        .btn { background: #3498db; color: white; border: none; padding: 10px 15px; border-radius: 4px; cursor: pointer; font-size: 14px; margin-bottom: 10px; transition: background 0.2s;}
+        .btn:hover { background: #2980b9; }
+        .btn-connect { display: block; margin: 0 auto 20px auto; width: 200px; font-size: 16px; background: #e67e22; }
+        .btn-connect:hover { background: #d35400; }
+        .group-item { padding: 12px; border: 1px solid #ddd; margin-bottom: 8px; border-radius: 4px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; }
+        .group-item:hover { background: #f0f4f8; border-color: #3498db; }
+        .group-item.active { background: #e1eff8; border-color: #3498db; }
+        .rssi-badge { background: #2c3e50; color: white; padding: 3px 8px; border-radius: 12px; font-size: 12px; }
+        .header-btn { background: #2ecc71; margin-right: 10px; margin-bottom: 10px; }
+        .header-btn:hover { background: #27ae60; }
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; margin-bottom: 5px; font-weight: bold; font-size: 14px;}
+        .form-group input { width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
+        #sendForm { display: none; margin-top: 20px; padding-top: 20px; border-top: 1px solid #eee; }
+        h3 { margin-top: 0; }
+    </style>
+</head>
+<body>
+    <h1>📡 Radio Scanner & Injector</h1>
+    <button class="btn btn-connect" id="connectBtn">Connect to Micro:bit</button>
+
+    <div class="container">
+        <div class="panel">
+            <h3>Captured Radio Groups</h3>
+            <p style="font-size: 12px; color: #666;">Sorted by signal strength (RSSI)</p>
+            <div id="groupsList"><em style="color: #999;">Waiting for captures...</em></div>
+        </div>
+
+        <div class="panel">
+            <h3 id="selectedGroupLabel">Select a group to view</h3>
+            
+            <div id="headersContainer" style="display: none;">
+                <p style="font-size: 14px; font-weight: bold;">Captured Headers:</p>
+                <div id="headersList"></div>
+            </div>
+
+            <div id="sendForm">
+                <h4 id="selectedHeaderLabel" style="color: #e74c3c;">Targeting: </h4>
+                <div class="form-group">
+                    <label>Injection Value (Optional)</label>
+                    <input type="text" id="cmdValue" placeholder="e.g. true, 100, forward">
+                    <small style="color: #7f8c8d;">Leave blank to send just the header string.</small>
+                </div>
+                <div class="form-group">
+                    <label>Duration (Seconds)</label>
+                    <input type="number" id="cmdDuration" value="-1" step="0.5">
+                    <small style="color: #7f8c8d;">Set to -1 to fire the packet only once.</small>
+                </div>
+                <button id="sendBtn" class="btn" style="background: #e74c3c; width: 100%;">Transmit Signal</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        class RadioScanner {
+            constructor() {
+                this.port = null;
+                this.reader = null;
+                this.writer = null;
+                this.groups = {};
+                this.currentGroup = null;
+                this.currentHeader = null;
+                this.bindEvents();
+            }
+
+            bindEvents() {
+                document.getElementById('connectBtn').addEventListener('click', () => this.connect());
+                document.getElementById('sendBtn').addEventListener('click', () => this.sendCommand());
+            }
+
+            async connect() {
+                try {
+                    this.port = await navigator.serial.requestPort();
+                    await this.port.open({ baudRate: 115200 });
+                    
+                    document.getElementById('connectBtn').style.display = 'none';
+
+                    const textEncoder = new TextEncoderStream();
+                    textEncoder.readable.pipeTo(this.port.writable);
+                    this.writer = textEncoder.writable.getWriter();
+
+                    const textDecoder = new TextDecoderStream();
+                    this.port.readable.pipeTo(textDecoder.writable);
+                    this.reader = textDecoder.readable.getReader();
+
+                    this.readLoop();
+                } catch (error) {
+                    console.error("Connection failed:", error);
+                    alert("Failed to connect. Ensure your micro:bit is plugged in.");
+                }
+            }
+
+            async readLoop() {
+                if (!this.reader) return;
+                let inputBuffer = '';
+                try {
+                    while (true) {
+                        const { value, done } = await this.reader.read();
+                        if (done) {
+                            this.reader.releaseLock();
+                            break;
+                        }
+                        if (value) {
+                            inputBuffer += value;
+                            const lines = inputBuffer.split('\n');
+                            inputBuffer = lines.pop() || ''; 
+                            for (const line of lines) {
+                                this.processLine(line.trim());
+                            }
+                        }
+                    }
+                } catch (error) {
+                    console.error("Read error:", error);
+                }
+            }
+
+            processLine(line) {
+                if (line.startsWith("CAP:")) {
+                    const parts = line.split(":");
+                    if (parts.length >= 4) {
+                        const grp = parseInt(parts[1], 10);
+                        const rssi = parseInt(parts[2], 10);
+                        const msg = parts.slice(3).join(":");
+                        
+                        if (!this.groups[grp]) {
+                            this.groups[grp] = { rssi: rssi, messages: new Set() };
+                        } else {
+                            this.groups[grp].rssi = Math.max(this.groups[grp].rssi, rssi);
+                        }
+                        
+                        this.groups[grp].messages.add(msg);
+                        this.updateGroupsUI();
+                    }
+                }
+            }
+
+            updateGroupsUI() {
+                const list = document.getElementById("groupsList");
+                if (Object.keys(this.groups).length === 0) return;
+                
+                list.innerHTML = "";
+                const sortedGroups = Object.keys(this.groups)
+                    .map(g => parseInt(g, 10))
+                    .sort((a, b) => this.groups[b].rssi - this.groups[a].rssi);
+                
+                for (const grp of sortedGroups) {
+                    const div = document.createElement("div");
+                    div.className = "group-item" + (this.currentGroup === grp ? " active" : "");
+                    div.onclick = () => this.selectGroup(grp);
+                    
+                    const title = document.createElement("span");
+                    title.innerText = `Channel ${grp}`;
+                    
+                    const badge = document.createElement("span");
+                    badge.className = "rssi-badge";
+                    badge.innerText = `${this.groups[grp].rssi} dBm`;
+                    
+                    div.appendChild(title);
+                    div.appendChild(badge);
+                    list.appendChild(div);
+                }
+            }
+
+            selectGroup(grp) {
+                this.currentGroup = grp;
+                this.updateGroupsUI(); 
+                
+                document.getElementById("selectedGroupLabel").innerText = `Inspecting Channel ${grp}`;
+                document.getElementById("headersContainer").style.display = "block";
+                document.getElementById("sendForm").style.display = "none";
+                
+                const headersList = document.getElementById("headersList");
+                headersList.innerHTML = "";
+                
+                const headers = new Set();
+                for (const msg of this.groups[grp].messages) {
+                    const header = msg.split(":")[0];
+                    headers.add(header);
+                }
+                
+                headers.forEach(h => {
+                    const btn = document.createElement("button");
+                    btn.className = "btn header-btn";
+                    btn.innerText = h;
+                    btn.onclick = () => this.selectHeader(h);
+                    headersList.appendChild(btn);
+                });
+            }
+
+            selectHeader(header) {
+                this.currentHeader = header;
+                document.getElementById("selectedHeaderLabel").innerText = `Targeting Protocol: ${header}`;
+                document.getElementById("cmdValue").value = "";
+                document.getElementById("cmdDuration").value = "-1";
+                document.getElementById("sendForm").style.display = "block";
+            }
+
+            async sendCommand() {
+                if (!this.writer || this.currentGroup === null || !this.currentHeader) return;
+
+                const val = document.getElementById("cmdValue").value.trim();
+                const dur = parseFloat(document.getElementById("cmdDuration").value) || -1;
+                
+                let finalMsg = this.currentHeader;
+                if (val !== "") {
+                    finalMsg += ":" + val;
+                }
+                
+                const cmd = `SEND:${this.currentGroup}:${dur}:${finalMsg}\n`;
+                await this.writer.write(cmd);
+                console.log("Transmitting: ", cmd);
+            }
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            new RadioScanner();
+        });
+    </script>
+</body>
+</html>
