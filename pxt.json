@@ -13,7 +13,8 @@
         "Network.ts",
         "UltraSonicSensor.ts",
         "Bot.ts",
-        "Motors.ts"
+        "Motors.ts",
+        "Global.ts"
     ],
     "testFiles": [
         "test.ts"
