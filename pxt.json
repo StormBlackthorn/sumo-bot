@@ -14,7 +14,8 @@
         "UltraSonicSensor.ts",
         "Bot.ts",
         "Motors.ts",
-        "Global.ts"
+        "Global.ts",
+        "Scanner.ts"
     ],
     "testFiles": [
         "test.ts"
