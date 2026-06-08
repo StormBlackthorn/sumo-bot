@@ -9,11 +9,9 @@ namespace Network {
             this.name = name;
             this.data = data;
         }
-
     }
 
     export namespace NetworkPacketTypes {
-
         //reversed for bot and controller 
         export enum RecievedPacket {
             RED_BUTTON_PRESSED, RED_BUTTON_RELEASED
@@ -29,82 +27,73 @@ namespace Network {
     }
 
     export function init() : void {
-
+        // Listen for simple strings
         radio.onReceivedString(str => {
-            if (!RadioSniffer.searching) Network.onRecieveCallback(JSON.parse(str))
-            else {
-                RadioSniffer.found();
-
-                RadioSniffer.addInstruction(str);
+            if (!RadioSniffer.searching) {
+                if (Network.onRecieveCallback) Network.onRecieveCallback(JSON.parse(str));
+            } else {
+                RadioSniffer.found(str, radio.receivedSignalStrength());
             }
-        })
+        });
 
+        // Listen for name:value pairs (common in MakeCode protocols)
         radio.onReceivedValue((name, value) => {
-            if(!RadioSniffer.searching) throw "Unexpected onRecievedValue event when Radio Sniffer is not sniffing";
-            RadioSniffer.found();
-           
-            //only add if its a unique instruction
-            RadioSniffer.addInstruction(new RadioSniffer.Packet(name, value));
-        })
-
+            if(!RadioSniffer.searching) return;
+            RadioSniffer.found(`${name}:${value}`, radio.receivedSignalStrength());
+        });
     }
 
-
     export namespace RadioSniffer {
-
         export class Packet {
             constructor(public readonly name : string, public readonly value : number) {};
         }
 
-               const waitTime     : number   = 30; //30ms wait
-               const sniffPerCycle: number   = 67; // 2 second sniff time each time
-        export let   currentIndex : number   = Global.deviceType === Global.DEVICE_TYPE.BOT ? -2 : -1; 
-        export let   foundID      : number   = -1; //-1 -> not found
-        export let   searching    : boolean  = false;
-               let   delimeter    : string; 
+        const waitTime     : number   = 30; // 30ms wait per channel
+        const sniffPerCycle: number   = 67; // ~2 seconds total per cycle (67 * 30ms)
+        
+        export let currentIndex : number  = 0; 
+        export let searching    : boolean = false;
         export const instructions : (string | RadioSniffer.Packet)[] = [];
-        export const searchOrder  : number[] = [
-            67, 69, 42, 1, 255, //auto generate fill
-        ]
 
         export function sniff() : void {
+            searching = true;
             for (let i : number = 0; i < sniffPerCycle; i++) {
-                currentIndex += 2;
-                radio.setGroup(searchOrder[currentIndex]);
+                radio.setGroup(currentIndex);
                 basic.pause(waitTime);
 
-                if(RadioSniffer.foundID != -1) {
-                    music.ringTone(Note.C);
-                    break; 
+                // Increment and loop back if we exceed 255
+                currentIndex++;
+                if (currentIndex > 255) {
+                    currentIndex = 0; 
                 }
+            }
+            searching = false;
+            // Always restore the default group when the scan cycle ends
+            radio.setGroup(Global.radioGroup); 
+        }
 
-           }
+        export function found(packetData: string, rssi: number) : void {
+            // Format string to be parsed by the HTML file: CAP:{group}:{rssi}:{msg}
+            serial.writeLine(`CAP:${currentIndex}:${rssi}:${packetData}`);
+            
+            // Play a ping noise every time a channel packet is captured
+            music.playTone(880, music.beat(BeatFraction.Sixteenth));
         }
 
         export function addInstruction(instruction : string | RadioSniffer.Packet) : void {
-            if(typeof instruction === "string") {
-                
-            } else {
-
-            }
+            instructions.push(instruction);
         }
 
         export function printInstructions() : void {
-
+            // Stub for logging if needed
         }
 
         export function runRemoteInstruction(index : number, value?: string) : void {
-
-        }
-
-        export function found() : void {
-            RadioSniffer.foundID = RadioSniffer.searchOrder[RadioSniffer.currentIndex];
+            // Stub for remote execution
         }
 
         export function setStringInstructionDelimeter(delimeter: string) {
-
+            // Stub for delimiter setup
         }
-
     }
-
 }

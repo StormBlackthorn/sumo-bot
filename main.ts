@@ -1,16 +1,15 @@
-let scanning = true
-let currentGroup = 0
 serial.setBaudRate(BaudRate.BaudRate115200)
 
-// Listen for and capture incoming radio packets
-radio.onReceivedString(function (receivedString: string) {
-    if (scanning) {
-        let rssi = radio.receivedSignalStrength()
-        // Format string to be parsed by the HTML file: CAP:{group}:{rssi}:{msg}
-        serial.writeLine(`CAP:${currentGroup}:${rssi}:${receivedString}`)
-        music.playTone(880, music.beat(BeatFraction.Sixteenth))
-    }
+// Initialize the global environment so we have a fallback channel
+Global.init({
+    deviceType: Global.DEVICE_TYPE.CONTRLLER,
+    radioGroup: 1
 })
+
+// Initialize Network (this hooks up the event listeners properly)
+Network.init()
+
+let isInjecting = false;
 
 // Process incoming injection commands from the HTML interface
 serial.onDataReceived(serial.delimiters(Delimiters.NewLine), function () {
@@ -23,7 +22,7 @@ serial.onDataReceived(serial.delimiters(Delimiters.NewLine), function () {
             let targetGroup = parseFloat(parts[1])
             let duration = parseFloat(parts[2])
             
-            // Re-stitch the message in case the value contained colons
+            // Re-stitch the message in case the user's value contained colons
             let msg = ""
             for (let i = 3; i < parts.length; i++) {
                 msg += parts[i]
@@ -33,37 +32,48 @@ serial.onDataReceived(serial.delimiters(Delimiters.NewLine), function () {
             }
 
             // Pause the scanner and hop to the target frequency
-            scanning = false
+            isInjecting = true;
+            Network.RadioSniffer.searching = false; 
             radio.setGroup(targetGroup)
+
+            // Determine if we need to send a String or a Name/Value pair
+            let sendParts = msg.split(":");
+            let isNameValue = sendParts.length > 1 && !isNaN(parseFloat(sendParts[1]));
 
             if (duration < 0) {
                 // Single fire
-                radio.sendString(msg)
+                if (isNameValue) {
+                    radio.sendValue(sendParts[0], parseFloat(sendParts[1]));
+                } else {
+                    radio.sendString(msg);
+                }
             } else {
                 // Sustained burst fire
                 let sendStart = control.millis()
                 while (control.millis() - sendStart < duration * 1000) {
-                    radio.sendString(msg)
+                    if (isNameValue) {
+                        radio.sendValue(sendParts[0], parseFloat(sendParts[1]));
+                    } else {
+                        radio.sendString(msg);
+                    }
                     basic.pause(100)
                 }
             }
             
-            // Return to scanner loop
-            radio.setGroup(currentGroup)
-            scanning = true
+            // Return to default group and allow the scanner to resume
+            radio.setGroup(Global.radioGroup)
+            isInjecting = false;
         }
     }
 })
 
-// Main 30ms Scanner Loop
+// Main Background Loop
 basic.forever(function () {
-    if (scanning) {
-        radio.setGroup(currentGroup)
-        basic.pause(30) // Wait 30ms on frequency
+    if (!isInjecting) {
+        // Runs the 2-second sniffer cycle block
+        Network.RadioSniffer.sniff()
         
-        currentGroup++
-        if (currentGroup > 255) {
-            currentGroup = 0 // Loop back
-        }
+        // Brief pause to allow other system tasks to process before starting the next cycle
+        basic.pause(10) 
     }
 })
