@@ -4,7 +4,7 @@
         <meta charset="UTF-8" />
         <title>Sumo Bot Radio Dashboard</title>
         <style>
-            @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Inter:wght@400;500;600&display=swap');
+            @import url("https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Inter:wght@400;500;600&display=swap");
 
             :root {
                 --bg-primary: #0b0f19;
@@ -22,7 +22,7 @@
                 --accent-red-glow: rgba(239, 68, 68, 0.4);
                 --border-color: #273549;
                 --border-glow: rgba(6, 182, 212, 0.1);
-                --font-family: 'Space Grotesk', 'Inter', sans-serif;
+                --font-family: "Space Grotesk", "Inter", sans-serif;
             }
 
             * {
@@ -64,40 +64,58 @@
                 background: rgba(22, 30, 46, 0.7);
                 backdrop-filter: blur(12px);
                 border: 1px solid var(--border-color);
-                border-radius: 12px;
-                padding: 20px;
+                border-radius: 8px;
+                padding: 10px 16px;
                 display: flex;
                 justify-content: space-between;
                 align-items: center;
                 flex-wrap: wrap;
                 gap: 20px;
-                box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+                box-shadow:
+                    0 4px 30px rgba(0, 0, 0, 0.5),
+                    inset 0 1px 0 rgba(255, 255, 255, 0.05);
             }
 
             .logo-area {
                 display: flex;
                 align-items: center;
-                gap: 15px;
+                gap: 10px;
             }
 
-            .logo-icon {
-                font-size: 2rem;
-                filter: drop-shadow(0 0 8px var(--accent-cyan));
-                animation: scanPulse 3s infinite ease-in-out;
+            .brand-block {
+                background: rgba(11, 15, 25, 0.6);
+                border: 1px solid var(--border-color);
+                border-radius: 4px;
+                padding: 6px 12px;
+                display: flex;
+                flex-direction: column;
+                min-width: 120px;
+                font-family: monospace;
+                box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.02);
+                transition:
+                    border-color 0.2s,
+                    box-shadow 0.2s;
             }
 
-            @keyframes scanPulse {
-                0%, 100% { transform: scale(1); filter: drop-shadow(0 0 4px var(--accent-cyan)); }
-                50% { transform: scale(1.1); filter: drop-shadow(0 0 12px var(--accent-cyan)); }
+            .brand-block:hover {
+                border-color: var(--accent-cyan);
+                box-shadow: 0 0 8px var(--border-glow);
             }
 
-            h1 {
-                font-size: 1.5rem;
+            .brand-label {
+                font-size: 0.65rem;
+                color: var(--text-secondary);
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
                 font-weight: 700;
-                background: linear-gradient(135deg, #fff 30%, var(--accent-cyan));
-                -webkit-background-clip: text;
-                -webkit-text-fill-color: transparent;
-                letter-spacing: -0.5px;
+            }
+
+            .brand-value {
+                font-size: 1rem;
+                font-weight: 700;
+                color: var(--accent-cyan);
+                margin-top: 2px;
+                transition: color 0.2s;
             }
 
             .header-controls {
@@ -133,8 +151,12 @@
             }
 
             @keyframes ledPulse {
-                0% { opacity: 0.4; }
-                100% { opacity: 1; }
+                0% {
+                    opacity: 0.4;
+                }
+                100% {
+                    opacity: 1;
+                }
             }
 
             /* Form Elements */
@@ -159,7 +181,9 @@
                 font-family: var(--font-family);
                 font-size: 0.9rem;
                 outline: none;
-                transition: border-color 0.2s, box-shadow 0.2s;
+                transition:
+                    border-color 0.2s,
+                    box-shadow 0.2s;
             }
 
             .control-input:focus {
@@ -241,7 +265,7 @@
                 flex: 1;
             }
 
-            @media(max-width: 900px) {
+            @media (max-width: 900px) {
                 .main-grid {
                     grid-template-columns: 1fr;
                 }
@@ -379,7 +403,7 @@
             }
 
             .tab-btn.active::after {
-                content: '';
+                content: "";
                 position: absolute;
                 bottom: -1px;
                 left: 0;
@@ -513,8 +537,12 @@
             }
 
             @keyframes spin {
-                0% { transform: rotate(0deg); }
-                100% { transform: rotate(360deg); }
+                0% {
+                    transform: rotate(0deg);
+                }
+                100% {
+                    transform: rotate(360deg);
+                }
             }
 
             /* Tab 2: Logs list */
@@ -570,7 +598,7 @@
                 flex: 1;
             }
 
-            @media(max-width: 768px) {
+            @media (max-width: 768px) {
                 .joystick-tab-panel {
                     grid-template-columns: 1fr;
                 }
@@ -728,10 +756,17 @@
     <body>
         <header>
             <div class="logo-area">
-                <span class="logo-icon">📡</span>
-                <div>
-                    <h1>SUMO BOT RADIO SCOUT</h1>
-                    <p style="font-size: 0.75rem; color: var(--text-secondary);">Advanced Micro:bit Radio Signal Monitor & Controller</p>
+                <div class="brand-block">
+                    <span class="brand-label">Radio Group</span>
+                    <span class="brand-value" id="activeGroupDisplay"
+                        >Ch --</span
+                    >
+                </div>
+                <div class="brand-block">
+                    <span class="brand-label">Sniffer Status</span>
+                    <span class="brand-value" id="snifferStatusDisplay"
+                        >Not Sniffing</span
+                    >
                 </div>
             </div>
 
@@ -743,7 +778,13 @@
 
                 <div class="input-group">
                     <label for="delimiterSetting">Delimiter:</label>
-                    <input type="text" id="delimiterSetting" class="control-input" value=":" style="width: 45px; text-align: center;" />
+                    <input
+                        type="text"
+                        id="delimiterSetting"
+                        class="control-input"
+                        value=":"
+                        style="width: 45px; text-align: center"
+                    />
                 </div>
 
                 <label class="checkbox-group">
@@ -762,12 +803,28 @@
             <div class="panel">
                 <div class="panel-header">
                     <div class="panel-title">Channels</div>
-                    <button class="btn" style="padding: 4px 8px; font-size: 0.75rem;" id="clearGroupsBtn">Clear</button>
+                    <div style="display: flex; gap: 5px">
+                        <button
+                            class="btn btn-primary"
+                            style="padding: 4px 8px; font-size: 0.75rem"
+                            id="scanBtn"
+                            disabled
+                        >
+                            🔍 Scan
+                        </button>
+                        <button
+                            class="btn"
+                            style="padding: 4px 8px; font-size: 0.75rem"
+                            id="clearGroupsBtn"
+                        >
+                            Clear
+                        </button>
+                    </div>
                 </div>
                 <div id="groupsList">
                     <div class="empty-state">
                         <span>📡</span>
-                        <p style="font-size: 0.8rem;">Waiting for captures...</p>
+                        <p style="font-size: 0.8rem">Waiting for captures...</p>
                     </div>
                 </div>
             </div>
@@ -775,38 +832,89 @@
             <!-- Right Panel: Workspace (Tabs) -->
             <div class="panel">
                 <div class="tabs-header">
-                    <button class="tab-btn active" data-tab="tab-control">Control & Injector</button>
-                    <button class="tab-btn" data-tab="tab-logs">Packet Logs</button>
-                    <button class="tab-btn" data-tab="tab-joystick">Joystick Emulator</button>
+                    <button class="tab-btn active" data-tab="tab-control">
+                        Control & Injector
+                    </button>
+                    <button class="tab-btn" data-tab="tab-logs">
+                        Packet Logs
+                    </button>
+                    <button class="tab-btn" data-tab="tab-joystick">
+                        Joystick Emulator
+                    </button>
                 </div>
 
                 <!-- Tab 1: Control & Injector -->
                 <div class="tab-content active" id="tab-control">
                     <div class="injector-grid">
                         <div class="injector-form-container">
-                            <h3 id="selectedGroupLabel" style="font-size: 1.1rem; color: var(--accent-cyan); margin-bottom: 10px;">Select a channel to begin</h3>
-                            
+                            <h3
+                                id="selectedGroupLabel"
+                                style="
+                                    font-size: 1.1rem;
+                                    color: var(--accent-cyan);
+                                    margin-bottom: 10px;
+                                "
+                            >
+                                Select a channel to begin
+                            </h3>
+
                             <div class="form-row">
                                 <label>Target Signal Name (Protocol)</label>
-                                <input type="text" id="cmdHeader" class="control-input" placeholder="e.g. speed, drive, angle" />
+                                <input
+                                    type="text"
+                                    id="cmdHeader"
+                                    class="control-input"
+                                    placeholder="e.g. speed, drive, angle"
+                                />
                             </div>
 
                             <div class="form-row">
                                 <label>Injection Value (Optional)</label>
-                                <input type="text" id="cmdValue" class="control-input" placeholder="e.g. 100, true, stop" />
+                                <input
+                                    type="text"
+                                    id="cmdValue"
+                                    class="control-input"
+                                    placeholder="e.g. 100, true, stop"
+                                />
                             </div>
 
                             <div class="form-row">
                                 <label>Spam Duration (Seconds)</label>
-                                <input type="number" id="cmdDuration" class="control-input" value="-1" step="0.1" />
-                                <span style="font-size: 0.75rem; color: var(--text-secondary)">Set to -1 to fire once. Else sends every frame for X seconds.</span>
+                                <input
+                                    type="number"
+                                    id="cmdDuration"
+                                    class="control-input"
+                                    value="-1"
+                                    step="0.1"
+                                />
+                                <span
+                                    style="
+                                        font-size: 0.75rem;
+                                        color: var(--text-secondary);
+                                    "
+                                    >Set to -1 to fire once. Else sends every
+                                    frame for X seconds.</span
+                                >
                             </div>
 
-                            <div style="display: flex; gap: 10px;">
-                                <button id="sendBtn" class="btn btn-danger" style="flex: 1; justify-content: center;" disabled>
+                            <div style="display: flex; gap: 10px">
+                                <button
+                                    id="sendBtn"
+                                    class="btn btn-danger"
+                                    style="flex: 1; justify-content: center"
+                                    disabled
+                                >
                                     🚀 Transmit Signal
                                 </button>
-                                <button id="connectToGroupBtn" class="btn" style="border-color: var(--accent-cyan); color: var(--accent-cyan);" disabled>
+                                <button
+                                    id="connectToGroupBtn"
+                                    class="btn"
+                                    style="
+                                        border-color: var(--accent-cyan);
+                                        color: var(--accent-cyan);
+                                    "
+                                    disabled
+                                >
                                     Listen / Set Group
                                 </button>
                             </div>
@@ -814,20 +922,62 @@
                             <div class="spam-overlay" id="spamOverlay">
                                 <div class="spam-spinner"></div>
                                 <div>
-                                    <strong style="color: var(--accent-red);">SPAMMING TRANSMISSION EVERY FRAME</strong>
-                                    <p id="spamCountdown" style="font-size: 0.8rem; margin-top: 4px; color: var(--text-secondary);">Remaining: --</p>
+                                    <strong style="color: var(--accent-red)"
+                                        >SPAMMING TRANSMISSION EVERY
+                                        FRAME</strong
+                                    >
+                                    <p
+                                        id="spamCountdown"
+                                        style="
+                                            font-size: 0.8rem;
+                                            margin-top: 4px;
+                                            color: var(--text-secondary);
+                                        "
+                                    >
+                                        Remaining: --
+                                    </p>
                                 </div>
-                                <button id="cancelSpamBtn" class="btn" style="padding: 4px 10px; font-size: 0.8rem;">Cancel</button>
+                                <button
+                                    id="cancelSpamBtn"
+                                    class="btn"
+                                    style="padding: 4px 10px; font-size: 0.8rem"
+                                >
+                                    Cancel
+                                </button>
                             </div>
                         </div>
 
                         <div class="packets-list-container">
-                            <div class="panel-header" style="margin-bottom: 10px; border-bottom: none; padding-bottom: 0;">
-                                <div class="panel-title" style="font-size: 0.95rem; color: var(--text-secondary);">Captured Packets</div>
-                                <button class="btn" style="padding: 2px 6px; font-size: 0.7rem;" id="clearPacketsBtn">Reset</button>
+                            <div
+                                class="panel-header"
+                                style="
+                                    margin-bottom: 10px;
+                                    border-bottom: none;
+                                    padding-bottom: 0;
+                                "
+                            >
+                                <div
+                                    class="panel-title"
+                                    style="
+                                        font-size: 0.95rem;
+                                        color: var(--text-secondary);
+                                    "
+                                >
+                                    Captured Packets
+                                </div>
+                                <button
+                                    class="btn"
+                                    style="padding: 2px 6px; font-size: 0.7rem"
+                                    id="clearPacketsBtn"
+                                >
+                                    Reset
+                                </button>
                             </div>
                             <div class="packets-list" id="headersList">
-                                <div class="empty-state" style="padding: 20px 0; font-size: 0.8rem;">
+                                <div
+                                    class="empty-state"
+                                    style="padding: 20px 0; font-size: 0.8rem"
+                                >
                                     <span>Empty</span>
                                 </div>
                             </div>
@@ -838,26 +988,49 @@
                 <!-- Tab 2: Packet Logs -->
                 <div class="tab-content" id="tab-logs">
                     <div class="logs-tab-panel">
-                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <div
+                            style="
+                                display: flex;
+                                justify-content: space-between;
+                                align-items: center;
+                            "
+                        >
                             <label class="checkbox-group">
-                                <input type="checkbox" id="logsFilterCheck" checked />
+                                <input
+                                    type="checkbox"
+                                    id="logsFilterCheck"
+                                    checked
+                                />
                                 <span>Only show active channel</span>
                             </label>
-                            <div style="display: flex; gap: 8px;">
+                            <div style="display: flex; gap: 8px">
                                 <label class="checkbox-group">
-                                    <input type="checkbox" id="logsAutoscrollCheck" checked />
+                                    <input
+                                        type="checkbox"
+                                        id="logsAutoscrollCheck"
+                                        checked
+                                    />
                                     <span>Auto-scroll</span>
                                 </label>
-                                <button class="btn" style="padding: 4px 8px; font-size: 0.75rem;" id="clearLogsBtn">Clear Logs</button>
+                                <button
+                                    class="btn"
+                                    style="padding: 4px 8px; font-size: 0.75rem"
+                                    id="clearLogsBtn"
+                                >
+                                    Clear Logs
+                                </button>
                             </div>
                         </div>
-                        <div class="logs-table-container" id="logsTableContainer">
+                        <div
+                            class="logs-table-container"
+                            id="logsTableContainer"
+                        >
                             <table class="logs-table">
                                 <thead>
                                     <tr>
-                                        <th style="width: 110px;">Time</th>
-                                        <th style="width: 60px;">Ch</th>
-                                        <th style="width: 80px;">RSSI</th>
+                                        <th style="width: 110px">Time</th>
+                                        <th style="width: 60px">Ch</th>
+                                        <th style="width: 80px">RSSI</th>
                                         <th>Name</th>
                                         <th>Value</th>
                                     </tr>
@@ -874,37 +1047,74 @@
                 <div class="tab-content" id="tab-joystick">
                     <div class="joystick-tab-panel">
                         <div class="joystick-canvas-container">
-                            <canvas id="joystickCanvas" width="200" height="200"></canvas>
+                            <canvas
+                                id="joystickCanvas"
+                                width="200"
+                                height="200"
+                            ></canvas>
                         </div>
                         <div class="joystick-settings">
                             <div class="coordinate-display">
                                 <div class="coord-box">
-                                    <div class="coord-box-label" id="joystickXLabel">X-Axis Value</div>
-                                    <div class="coord-box-val" id="coordValX">0</div>
+                                    <div
+                                        class="coord-box-label"
+                                        id="joystickXLabel"
+                                    >
+                                        X-Axis Value
+                                    </div>
+                                    <div class="coord-box-val" id="coordValX">
+                                        0
+                                    </div>
                                 </div>
                                 <div class="coord-box">
-                                    <div class="coord-box-label" id="joystickYLabel">Y-Axis Value</div>
-                                    <div class="coord-box-val" id="coordValY">0</div>
+                                    <div
+                                        class="coord-box-label"
+                                        id="joystickYLabel"
+                                    >
+                                        Y-Axis Value
+                                    </div>
+                                    <div class="coord-box-val" id="coordValY">
+                                        0
+                                    </div>
                                 </div>
                             </div>
 
                             <div class="form-row">
                                 <label>X-Axis Packet Name</label>
-                                <input type="text" id="joyXName" class="control-input" value="x" />
+                                <input
+                                    type="text"
+                                    id="joyXName"
+                                    class="control-input"
+                                    value="x"
+                                />
                             </div>
 
                             <div class="form-row">
                                 <label>Y-Axis Packet Name</label>
-                                <input type="text" id="joyYName" class="control-input" value="y" />
+                                <input
+                                    type="text"
+                                    id="joyYName"
+                                    class="control-input"
+                                    value="y"
+                                />
                             </div>
 
                             <div class="form-row">
                                 <label>Min / Max Scale</label>
-                                <input type="number" id="joyScale" class="control-input" value="100" />
+                                <input
+                                    type="number"
+                                    id="joyScale"
+                                    class="control-input"
+                                    value="100"
+                                />
                             </div>
 
                             <label class="checkbox-group">
-                                <input type="checkbox" id="joyReturnCenter" checked />
+                                <input
+                                    type="checkbox"
+                                    id="joyReturnCenter"
+                                    checked
+                                />
                                 <span>Return to center on release</span>
                             </label>
                         </div>
@@ -930,14 +1140,36 @@
                         <input type="checkbox" id="serialPause" />
                         <span>Pause output</span>
                     </label>
-                    <button class="btn" style="padding: 2px 8px; font-size: 0.75rem;" id="clearSerialBtn">Clear</button>
+                    <button
+                        class="btn"
+                        style="padding: 2px 8px; font-size: 0.75rem"
+                        id="clearSerialBtn"
+                    >
+                        Clear
+                    </button>
                 </div>
             </div>
             <div class="serial-body" id="serialOutput"></div>
             <form class="serial-input-form" id="serialInputForm">
                 <span class="serial-prompt-symbol">&gt;_</span>
-                <input type="text" id="serialInputText" class="serial-input" placeholder="Type micro:bit command and press Enter (e.g. LISTEN:23, SCAN, SEND:23:-1:hello)..." autocomplete="off" />
-                <button type="submit" class="btn" style="padding: 4px 12px; margin-right: 4px; font-size: 0.8rem;">Send</button>
+                <input
+                    type="text"
+                    id="serialInputText"
+                    class="serial-input"
+                    placeholder="Type micro:bit command and press Enter (e.g. LISTEN:23, SCAN, SEND:23:-1:hello)..."
+                    autocomplete="off"
+                />
+                <button
+                    type="submit"
+                    class="btn"
+                    style="
+                        padding: 4px 12px;
+                        margin-right: 4px;
+                        font-size: 0.8rem;
+                    "
+                >
+                    Send
+                </button>
             </form>
         </div>
 
@@ -952,7 +1184,9 @@
                     this.activeSpamInterval = null;
                     this.spamRemainingMs = 0;
                     this.spamTimer = null;
-                    
+                    this.isScanning = false;
+                    this.activeGroup = null;
+
                     // Joystick Emulator State
                     this.joystickState = {
                         active: false,
@@ -964,52 +1198,135 @@
                         handleRadius: 25,
                         currentX: 100,
                         currentY: 100,
-                        throttleInterval: null
+                        throttleInterval: null,
                     };
 
                     this.bindEvents();
                     this.initTabs();
                     this.initJoystick();
+                    this.updateActiveGroupUI();
+                    this.setScanningState(false);
                 }
 
                 bindEvents() {
-                    document.getElementById("connectBtn").addEventListener("click", () => this.toggleConnection());
-                    document.getElementById("sendBtn").addEventListener("click", () => this.transmitSignal());
-                    document.getElementById("connectToGroupBtn").addEventListener("click", () => this.listenToActiveGroup());
-                    document.getElementById("clearGroupsBtn").addEventListener("click", () => this.clearGroups());
-                    document.getElementById("clearPacketsBtn").addEventListener("click", () => this.clearPackets());
-                    document.getElementById("clearLogsBtn").addEventListener("click", () => this.clearLogs());
-                    document.getElementById("clearSerialBtn").addEventListener("click", () => {
-                        document.getElementById("serialOutput").innerHTML = "";
-                    });
-                    document.getElementById("cancelSpamBtn").addEventListener("click", () => this.stopSpamming());
+                    document
+                        .getElementById("connectBtn")
+                        .addEventListener("click", () =>
+                            this.toggleConnection(),
+                        );
+                    document
+                        .getElementById("scanBtn")
+                        .addEventListener("click", () => this.toggleScan());
+                    document
+                        .getElementById("sendBtn")
+                        .addEventListener("click", () => this.transmitSignal());
+                    document
+                        .getElementById("connectToGroupBtn")
+                        .addEventListener("click", () =>
+                            this.listenToActiveGroup(),
+                        );
+                    document
+                        .getElementById("clearGroupsBtn")
+                        .addEventListener("click", () => this.clearGroups());
+                    document
+                        .getElementById("clearPacketsBtn")
+                        .addEventListener("click", () => this.clearPackets());
+                    document
+                        .getElementById("clearLogsBtn")
+                        .addEventListener("click", () => this.clearLogs());
+                    document
+                        .getElementById("clearSerialBtn")
+                        .addEventListener("click", () => {
+                            document.getElementById("serialOutput").innerHTML =
+                                "";
+                        });
+                    document
+                        .getElementById("cancelSpamBtn")
+                        .addEventListener("click", () => this.stopSpamming());
 
-                    document.getElementById("serialInputForm").addEventListener("submit", (e) => {
-                        e.preventDefault();
-                        this.sendRawSerialFromInput();
-                    });
+                    document
+                        .getElementById("serialInputForm")
+                        .addEventListener("submit", (e) => {
+                            e.preventDefault();
+                            this.sendRawSerialFromInput();
+                        });
 
                     // React to Delimiter configuration changes
-                    document.getElementById("delimiterSetting").addEventListener("input", () => {
-                        // Reprocess everything cached for safety
-                        this.rebuildUI();
-                    });
+                    document
+                        .getElementById("delimiterSetting")
+                        .addEventListener("input", () => {
+                            // Reprocess everything cached for safety
+                            this.rebuildUI();
+                        });
                 }
 
                 initTabs() {
                     const tabButtons = document.querySelectorAll(".tab-btn");
-                    const tabContents = document.querySelectorAll(".tab-content");
+                    const tabContents =
+                        document.querySelectorAll(".tab-content");
 
-                    tabButtons.forEach(btn => {
+                    tabButtons.forEach((btn) => {
                         btn.addEventListener("click", () => {
-                            tabButtons.forEach(b => b.classList.remove("active"));
-                            tabContents.forEach(c => c.classList.remove("active"));
+                            tabButtons.forEach((b) =>
+                                b.classList.remove("active"),
+                            );
+                            tabContents.forEach((c) =>
+                                c.classList.remove("active"),
+                            );
 
                             btn.classList.add("active");
                             const tabId = btn.getAttribute("data-tab");
-                            document.getElementById(tabId).classList.add("active");
+                            document
+                                .getElementById(tabId)
+                                .classList.add("active");
                         });
                     });
+                }
+
+                async toggleScan(silent = false) {
+                    if (!this.writer) return;
+
+                    if (this.isScanning) {
+                        await this.sendRawSerial("STOP_SCAN", silent);
+                        this.setScanningState(false);
+                    } else {
+                        await this.sendRawSerial("SCAN:10", silent);
+                        this.setScanningState(true);
+                    }
+                }
+
+                setScanningState(isScanning) {
+                    this.isScanning = isScanning;
+                    const scanBtn = document.getElementById("scanBtn");
+                    const snifferStatusDisplay = document.getElementById(
+                        "snifferStatusDisplay",
+                    );
+
+                    if (snifferStatusDisplay) {
+                        if (isScanning) {
+                            snifferStatusDisplay.innerText = "Sniffing";
+                            snifferStatusDisplay.style.color =
+                                "var(--accent-orange)";
+                        } else {
+                            snifferStatusDisplay.innerText = "Not Sniffing";
+                            snifferStatusDisplay.style.color =
+                                "var(--text-secondary)";
+                        }
+                    }
+
+                    if (!scanBtn) return;
+                    if (isScanning) {
+                        scanBtn.innerHTML = "⏹ Stop";
+                        scanBtn.classList.remove("btn-primary");
+                        scanBtn.classList.add("btn-danger");
+                        scanBtn.style.animation =
+                            "scanPulse 1.5s infinite ease-in-out";
+                    } else {
+                        scanBtn.innerHTML = "🔍 Scan";
+                        scanBtn.classList.remove("btn-danger");
+                        scanBtn.classList.add("btn-primary");
+                        scanBtn.style.animation = "none";
+                    }
                 }
 
                 // Web Serial Connect / Disconnect Toggle
@@ -1031,7 +1348,10 @@
                         await this.port.open({ baudRate: 115200 });
 
                         this.updateConnectionUI(true);
-                        this.logToTerminal("[SYSTEM] Connected successfully to Micro:bit.\n", "system");
+                        this.logToTerminal(
+                            "[SYSTEM] Connected successfully to Micro:bit.\n",
+                            "system",
+                        );
 
                         const textEncoder = new TextEncoderStream();
                         textEncoder.readable.pipeTo(this.port.writable);
@@ -1044,14 +1364,18 @@
                         this.readLoop();
                     } catch (error) {
                         console.error("Connection failed:", error);
-                        this.logToTerminal(`[SYSTEM ERROR] Connection failed: ${error.message}\n`, "error");
+                        this.logToTerminal(
+                            `[SYSTEM ERROR] Connection failed: ${error.message}\n`,
+                            "error",
+                        );
                         this.updateConnectionUI(false);
                     }
                 }
 
                 async disconnect() {
                     this.stopSpamming();
-                    
+                    this.setScanningState(false);
+
                     try {
                         if (this.reader) {
                             await this.reader.cancel();
@@ -1066,10 +1390,16 @@
                             this.port = null;
                         }
                         this.updateConnectionUI(false);
-                        this.logToTerminal("[SYSTEM] Disconnected from Micro:bit.\n", "system");
+                        this.logToTerminal(
+                            "[SYSTEM] Disconnected from Micro:bit.\n",
+                            "system",
+                        );
                     } catch (error) {
                         console.error("Disconnect failed:", error);
-                        this.logToTerminal(`[SYSTEM ERROR] Disconnect failed: ${error.message}\n`, "error");
+                        this.logToTerminal(
+                            `[SYSTEM ERROR] Disconnect failed: ${error.message}\n`,
+                            "error",
+                        );
                     }
                 }
 
@@ -1078,7 +1408,9 @@
                     const statusLed = document.getElementById("statusLed");
                     const connectBtn = document.getElementById("connectBtn");
                     const sendBtn = document.getElementById("sendBtn");
-                    const connectToGroupBtn = document.getElementById("connectToGroupBtn");
+                    const connectToGroupBtn =
+                        document.getElementById("connectToGroupBtn");
+                    const scanBtn = document.getElementById("scanBtn");
 
                     if (isConnected) {
                         statusText.innerText = "Connected";
@@ -1088,6 +1420,7 @@
                         connectBtn.classList.add("btn-danger");
                         sendBtn.removeAttribute("disabled");
                         connectToGroupBtn.removeAttribute("disabled");
+                        scanBtn.removeAttribute("disabled");
                     } else {
                         statusText.innerText = "Disconnected";
                         statusLed.classList.remove("connected");
@@ -1096,12 +1429,37 @@
                         connectBtn.classList.add("btn-primary");
                         sendBtn.setAttribute("disabled", "true");
                         connectToGroupBtn.setAttribute("disabled", "true");
+                        scanBtn.setAttribute("disabled", "true");
+
+                        // Reset button state and activeGroup tracking on disconnect
+                        connectToGroupBtn.innerHTML = "Listen / Set Group";
+                        connectToGroupBtn.style.borderColor = "";
+                        connectToGroupBtn.style.color = "";
+                        this.activeGroup = null;
+                    }
+                    this.updateActiveGroupUI();
+                }
+
+                updateActiveGroupUI() {
+                    const activeGroupDisplay =
+                        document.getElementById("activeGroupDisplay");
+                    if (activeGroupDisplay) {
+                        if (this.activeGroup !== null) {
+                            activeGroupDisplay.innerText = `Ch ${this.activeGroup}`;
+                            activeGroupDisplay.style.color =
+                                "var(--accent-emerald)";
+                        } else {
+                            activeGroupDisplay.innerText = "Ch --";
+                            activeGroupDisplay.style.color =
+                                "var(--text-secondary)";
+                        }
                     }
                 }
 
                 // Logging helper for the bottom console
                 logToTerminal(text, type = "in") {
-                    const isPaused = document.getElementById("serialPause").checked;
+                    const isPaused =
+                        document.getElementById("serialPause").checked;
                     if (isPaused && type !== "sys" && type !== "err") return;
 
                     const consoleDiv = document.getElementById("serialOutput");
@@ -1110,7 +1468,8 @@
                     span.textContent = text;
                     consoleDiv.appendChild(span);
 
-                    const autoscroll = document.getElementById("serialAutoscroll").checked;
+                    const autoscroll =
+                        document.getElementById("serialAutoscroll").checked;
                     if (autoscroll) {
                         consoleDiv.scrollTop = consoleDiv.scrollHeight;
                     }
@@ -1122,29 +1481,87 @@
                 }
 
                 // Sends arbitrary raw text to the Micro:bit
-                async sendRawSerial(command) {
+                async sendRawSerial(command, silent = false) {
                     if (!this.writer) {
-                        this.logToTerminal("[SYSTEM ERROR] Cannot send command, serial writer is offline.\n", "err");
+                        this.logToTerminal(
+                            "[SYSTEM ERROR] Cannot send command, serial writer is offline.\n",
+                            "err",
+                        );
                         return;
                     }
 
                     try {
-                        const cleanCommand = command.endsWith("\n") ? command : command + "\n";
+                        const cleanCommand = command.endsWith("\n")
+                            ? command
+                            : command + "\n";
                         await this.writer.write(cleanCommand);
-                        this.logToTerminal(`> ${cleanCommand}`, "out");
+                        if (!silent) {
+                            this.logToTerminal(`> ${cleanCommand}`, "out");
+                        }
                     } catch (e) {
                         console.error("Write error:", e);
-                        this.logToTerminal(`[SYSTEM ERROR] Serial Write failed: ${e.message}\n`, "err");
+                        this.logToTerminal(
+                            `[SYSTEM ERROR] Serial Write failed: ${e.message}\n`,
+                            "err",
+                        );
                     }
                 }
 
-                sendRawSerialFromInput() {
+                async sendRawSerialFromInput() {
                     const input = document.getElementById("serialInputText");
                     const cmd = input.value.trim();
                     if (!cmd) return;
 
-                    this.sendRawSerial(cmd);
                     input.value = "";
+
+                    const lowerCmd = cmd.toLowerCase();
+                    if (lowerCmd === "help") {
+                        this.logToTerminal(`> ${cmd}\n`, "out");
+                        this.logToTerminal(
+                            "Available commands:\n\n" +
+                            "set group <number>\n" +
+                            "    Sets the active radio group.\n" +
+                            "    Example: set group 56\n\n" +
+                            "scan\n" +
+                            "    Performs a radio group scan.\n\n" +
+                            "status\n" +
+                            "    Displays current radio group and sniffer state.\n",
+                            "sys"
+                        );
+                    } else if (lowerCmd.startsWith("set group ") || lowerCmd === "set group") {
+                        this.logToTerminal(`> ${cmd}\n`, "out");
+                        const numStr = cmd.substring(9).trim();
+                        const groupNum = parseInt(numStr, 10);
+                        if (isNaN(groupNum) || groupNum < 0 || groupNum > 255) {
+                            this.logToTerminal(`[SYSTEM ERROR] Invalid radio group. Usage: set group <number> (0-255)\n`, "err");
+                        } else {
+                            if (!this.writer) {
+                                this.logToTerminal("[SYSTEM ERROR] Cannot send command, serial writer is offline.\n", "err");
+                            } else {
+                                this.currentGroup = groupNum;
+                                this.selectGroup(groupNum);
+                                await this.sendRawSerial(`SET_GROUP:${groupNum}`, true);
+                            }
+                        }
+                    } else if (lowerCmd === "scan") {
+                        this.logToTerminal(`> ${cmd}\n`, "out");
+                        if (!this.writer) {
+                            this.logToTerminal("[SYSTEM ERROR] Cannot send command, serial writer is offline.\n", "err");
+                        } else {
+                            await this.toggleScan(true);
+                        }
+                    } else if (lowerCmd === "status") {
+                        this.logToTerminal(`> ${cmd}\n`, "out");
+                        const grpText = this.activeGroup !== null ? `Channel ${this.activeGroup}` : "Ch --";
+                        const snifferText = this.isScanning ? "Sniffing" : "Not Sniffing";
+                        this.logToTerminal(
+                            `Radio Group: ${grpText}\n` +
+                            `Sniffer Status: ${snifferText}\n`,
+                            "sys"
+                        );
+                    } else {
+                        await this.sendRawSerial(cmd);
+                    }
                 }
 
                 // Serial Read Loop
@@ -1169,7 +1586,10 @@
                         }
                     } catch (error) {
                         console.error("Read loop error:", error);
-                        this.logToTerminal(`[SYSTEM ERROR] Read error: ${error.message}\n`, "err");
+                        this.logToTerminal(
+                            `[SYSTEM ERROR] Read error: ${error.message}\n`,
+                            "err",
+                        );
                     }
                 }
 
@@ -1177,12 +1597,48 @@
                 processLine(line) {
                     if (!line) return;
 
+                    if (line === "SCAN_FINISHED") {
+                        this.setScanningState(false);
+                        this.logToTerminal(
+                            "[SYSTEM] Radio scan completed.\n",
+                            "sys",
+                        );
+                        return;
+                    }
+
+                    if (line.startsWith("SET_GROUP_ACK:")) {
+                        const grp = parseInt(line.split(":")[1], 10);
+                        if (!isNaN(grp)) {
+                            this.activeGroup = grp;
+                            this.logToTerminal(
+                                `[SYSTEM] Micro:bit switched to Channel ${grp}\n`,
+                                "sys",
+                            );
+
+                            // Re-render the active channel on the button
+                            const btn =
+                                document.getElementById("connectToGroupBtn");
+                            if (btn && this.currentGroup === grp) {
+                                btn.innerHTML = `🟢 Listening: Ch ${grp}`;
+                                btn.style.borderColor = "var(--accent-emerald)";
+                                btn.style.color = "var(--accent-emerald)";
+                            }
+                            this.updateGroupsUI();
+                            this.updateActiveGroupUI();
+                        }
+                        return;
+                    }
+
                     // Log to the serial monitor (unless user checked to filter out CAP:)
                     const isCapSpam = line.startsWith("CAP:");
-                    const filterCap = document.getElementById("serialHideCap").checked;
+                    const filterCap =
+                        document.getElementById("serialHideCap").checked;
 
                     if (!isCapSpam || !filterCap) {
-                        this.logToTerminal(line + "\n", isCapSpam ? "in" : "sys");
+                        this.logToTerminal(
+                            line + "\n",
+                            isCapSpam ? "in" : "sys",
+                        );
                     }
 
                     if (isCapSpam) {
@@ -1193,20 +1649,35 @@
                             const rawMsg = parts.slice(3).join(":"); // Rejoin everything else
 
                             // Channel Lock Check
-                            const isChannelLocked = document.getElementById("channelLockCheck").checked;
-                            if (isChannelLocked && this.currentGroup !== null && grp !== this.currentGroup) {
+                            const isChannelLocked =
+                                document.getElementById(
+                                    "channelLockCheck",
+                                ).checked;
+                            if (
+                                isChannelLocked &&
+                                this.currentGroup !== null &&
+                                grp !== this.currentGroup
+                            ) {
                                 return; // Discard packet
                             }
 
                             // Parse Custom Delimiter
-                            const delimiter = document.getElementById("delimiterSetting").value;
+                            const delimiter =
+                                document.getElementById(
+                                    "delimiterSetting",
+                                ).value;
                             let parsedName = rawMsg;
                             let parsedValue = "";
 
-                            if (delimiter !== "" && rawMsg.includes(delimiter)) {
+                            if (
+                                delimiter !== "" &&
+                                rawMsg.includes(delimiter)
+                            ) {
                                 const splitIdx = rawMsg.indexOf(delimiter);
                                 parsedName = rawMsg.substring(0, splitIdx);
-                                parsedValue = rawMsg.substring(splitIdx + delimiter.length);
+                                parsedValue = rawMsg.substring(
+                                    splitIdx + delimiter.length,
+                                );
                             }
 
                             // Initialize group if not present
@@ -1215,11 +1686,14 @@
                                     rssi: rssi,
                                     packetCount: 0,
                                     messages: [],
-                                    messagesMap: {}
+                                    messagesMap: {},
                                 };
                             } else {
                                 // Dynamic signal tracking
-                                this.groups[grp].rssi = Math.max(this.groups[grp].rssi, rssi);
+                                this.groups[grp].rssi = Math.max(
+                                    this.groups[grp].rssi,
+                                    rssi,
+                                );
                             }
 
                             this.groups[grp].packetCount++;
@@ -1227,13 +1701,14 @@
                             // Deduplication logic for the "Captured Packets" list:
                             // We only store/show the FIRST occurrence of a given name.
                             if (!this.groups[grp].messagesMap[parsedName]) {
-                                this.groups[grp].messagesMap[parsedName] = parsedValue;
+                                this.groups[grp].messagesMap[parsedName] =
+                                    parsedValue;
                                 this.groups[grp].messages.push({
                                     name: parsedName,
                                     value: parsedValue,
-                                    timestamp: Date.now()
+                                    timestamp: Date.now(),
                                 });
-                                
+
                                 // Repopulate list if this is the active group
                                 if (grp === this.currentGroup) {
                                     this.updatePacketsUI();
@@ -1241,21 +1716,30 @@
                             }
 
                             this.updateGroupsUI();
-                            this.logPacketToTab(grp, rssi, parsedName, parsedValue);
+                            this.logPacketToTab(
+                                grp,
+                                rssi,
+                                parsedName,
+                                parsedValue,
+                            );
                         }
                     }
                 }
 
                 // Add to Packet Logs Tab
                 logPacketToTab(grp, rssi, name, value) {
-                    const isFiltered = document.getElementById("logsFilterCheck").checked;
+                    const isFiltered =
+                        document.getElementById("logsFilterCheck").checked;
                     if (isFiltered && grp !== this.currentGroup) return;
 
                     const tbody = document.getElementById("logsTableBody");
                     const row = document.createElement("tr");
 
                     const now = new Date();
-                    const timeStr = now.toLocaleTimeString() + "." + String(now.getMilliseconds()).padStart(3, '0');
+                    const timeStr =
+                        now.toLocaleTimeString() +
+                        "." +
+                        String(now.getMilliseconds()).padStart(3, "0");
 
                     row.innerHTML = `
                         <td style="color: var(--text-secondary); font-size: 0.8rem;">${timeStr}</td>
@@ -1273,9 +1757,12 @@
                     }
 
                     // Autoscroll logs
-                    const autoscroll = document.getElementById("logsAutoscrollCheck").checked;
+                    const autoscroll = document.getElementById(
+                        "logsAutoscrollCheck",
+                    ).checked;
                     if (autoscroll) {
-                        const container = document.getElementById("logsTableContainer");
+                        const container =
+                            document.getElementById("logsTableContainer");
                         container.scrollTop = container.scrollHeight;
                     }
                 }
@@ -1290,11 +1777,14 @@
                     list.innerHTML = "";
                     const sortedGroups = Object.keys(this.groups)
                         .map((g) => parseInt(g, 10))
-                        .sort((a, b) => this.groups[b].rssi - this.groups[a].rssi);
+                        .sort(
+                            (a, b) => this.groups[b].rssi - this.groups[a].rssi,
+                        );
 
                     for (const grp of sortedGroups) {
                         const div = document.createElement("div");
-                        div.className = "group-item" + (activeGrp === grp ? " active" : "");
+                        div.className =
+                            "group-item" + (activeGrp === grp ? " active" : "");
                         div.onclick = () => this.selectGroup(grp);
 
                         const info = document.createElement("div");
@@ -1302,7 +1792,11 @@
 
                         const title = document.createElement("span");
                         title.className = "group-channel-label";
-                        title.innerText = `Channel ${grp}`;
+                        if (this.activeGroup === grp) {
+                            title.innerHTML = `🟢 Channel ${grp}`;
+                        } else {
+                            title.innerText = `Channel ${grp}`;
+                        }
 
                         const count = document.createElement("span");
                         count.className = "group-packet-count";
@@ -1325,16 +1819,34 @@
                     this.currentGroup = grp;
                     this.updateGroupsUI();
 
-                    document.getElementById("selectedGroupLabel").innerText = `Target Channel: Channel ${grp}`;
-                    
+                    document.getElementById("selectedGroupLabel").innerText =
+                        `Target Channel: Channel ${grp}`;
+
                     this.updatePacketsUI();
+
+                    // Update button status depending on whether it matches the active group
+                    const btn = document.getElementById("connectToGroupBtn");
+                    if (btn) {
+                        if (this.activeGroup === grp) {
+                            btn.innerHTML = `🟢 Listening: Ch ${grp}`;
+                            btn.style.borderColor = "var(--accent-emerald)";
+                            btn.style.color = "var(--accent-emerald)";
+                        } else {
+                            btn.innerHTML = `Listen / Set Group`;
+                            btn.style.borderColor = "var(--accent-cyan)";
+                            btn.style.color = "var(--accent-cyan)";
+                        }
+                    }
                 }
 
                 updatePacketsUI() {
                     const headersList = document.getElementById("headersList");
                     headersList.innerHTML = "";
 
-                    if (this.currentGroup === null || !this.groups[this.currentGroup]) {
+                    if (
+                        this.currentGroup === null ||
+                        !this.groups[this.currentGroup]
+                    ) {
                         headersList.innerHTML = `<div class="empty-state" style="padding: 20px 0; font-size: 0.8rem;"><span>Empty</span></div>`;
                         return;
                     }
@@ -1348,21 +1860,26 @@
                     listData.forEach((item) => {
                         const btn = document.createElement("button");
                         btn.className = "packet-btn";
-                        
+
                         const nameSpan = document.createElement("span");
                         nameSpan.className = "packet-btn-name";
                         nameSpan.innerText = item.name;
 
                         const valSpan = document.createElement("span");
                         valSpan.className = "packet-btn-val";
-                        valSpan.innerText = item.value !== "" ? `Val: ${item.value}` : `(Raw String)`;
+                        valSpan.innerText =
+                            item.value !== ""
+                                ? `Val: ${item.value}`
+                                : `(Raw String)`;
 
                         btn.appendChild(nameSpan);
                         btn.appendChild(valSpan);
 
                         btn.onclick = () => {
-                            document.getElementById("cmdHeader").value = item.name;
-                            document.getElementById("cmdValue").value = item.value;
+                            document.getElementById("cmdHeader").value =
+                                item.name;
+                            document.getElementById("cmdValue").value =
+                                item.value;
                         };
 
                         headersList.appendChild(btn);
@@ -1378,7 +1895,8 @@
                 clearGroups() {
                     this.groups = {};
                     this.currentGroup = null;
-                    document.getElementById("selectedGroupLabel").innerText = "Select a channel to begin";
+                    document.getElementById("selectedGroupLabel").innerText =
+                        "Select a channel to begin";
                     document.getElementById("groupsList").innerHTML = `
                         <div class="empty-state">
                             <span>📡</span>
@@ -1389,7 +1907,10 @@
                 }
 
                 clearPackets() {
-                    if (this.currentGroup !== null && this.groups[this.currentGroup]) {
+                    if (
+                        this.currentGroup !== null &&
+                        this.groups[this.currentGroup]
+                    ) {
                         this.groups[this.currentGroup].messages = [];
                         this.groups[this.currentGroup].messagesMap = {};
                         this.updatePacketsUI();
@@ -1405,26 +1926,38 @@
                     if (this.currentGroup === null) return;
                     // Command structure: SET_GROUP:<channel>
                     await this.sendRawSerial(`SET_GROUP:${this.currentGroup}`);
-                    this.logToTerminal(`[SYSTEM] Sent Listen command for Channel ${this.currentGroup}\n`, "sys");
+                    this.logToTerminal(
+                        `[SYSTEM] Sent Listen command for Channel ${this.currentGroup}\n`,
+                        "sys",
+                    );
                 }
 
                 // Dispatches manual commands and controls the GUI spamming timer
                 async transmitSignal() {
                     if (!this.writer || this.currentGroup === null) return;
 
-                    const header = document.getElementById("cmdHeader").value.trim();
+                    const header = document
+                        .getElementById("cmdHeader")
+                        .value.trim();
                     if (!header) {
                         alert("Please provide a packet header/name.");
                         return;
                     }
 
-                    const val = document.getElementById("cmdValue").value.trim();
-                    const dur = parseFloat(document.getElementById("cmdDuration").value) || -1;
+                    const val = document
+                        .getElementById("cmdValue")
+                        .value.trim();
+                    const dur =
+                        parseFloat(
+                            document.getElementById("cmdDuration").value,
+                        ) || -1;
 
                     let finalMsg = header;
                     if (val !== "") {
                         // Reconstruct with delimiter from input setting
-                        const delimiter = document.getElementById("delimiterSetting").value || ":";
+                        const delimiter =
+                            document.getElementById("delimiterSetting").value ||
+                            ":";
                         finalMsg += delimiter + val;
                     }
 
@@ -1438,13 +1971,18 @@
                     } else {
                         // High-frequency GUI spamming loop (every frame, ~16.6ms)
                         const overlay = document.getElementById("spamOverlay");
-                        const countdown = document.getElementById("spamCountdown");
+                        const countdown =
+                            document.getElementById("spamCountdown");
                         overlay.style.display = "flex";
-                        document.getElementById("sendBtn").setAttribute("disabled", "true");
+                        document
+                            .getElementById("sendBtn")
+                            .setAttribute("disabled", "true");
 
                         const cmd = `SEND:${this.currentGroup}:-1:${finalMsg}\n`;
                         const intervalMs = 16.6; // ~60fps target rate
-                        const totalSpamTicks = Math.round((dur * 1000) / intervalMs);
+                        const totalSpamTicks = Math.round(
+                            (dur * 1000) / intervalMs,
+                        );
                         let tickCount = 0;
                         const startTime = Date.now();
                         const durationMs = dur * 1000;
@@ -1467,7 +2005,8 @@
 
                         this.spamTimer = setInterval(() => {
                             const elapsed = Date.now() - startTime;
-                            const remaining = Math.max(0, durationMs - elapsed) / 1000;
+                            const remaining =
+                                Math.max(0, durationMs - elapsed) / 1000;
                             countdown.innerText = `Remaining: ${remaining.toFixed(1)}s`;
 
                             if (elapsed >= durationMs) {
@@ -1487,9 +2026,12 @@
                         this.spamTimer = null;
                     }
 
-                    document.getElementById("spamOverlay").style.display = "none";
+                    document.getElementById("spamOverlay").style.display =
+                        "none";
                     if (this.port) {
-                        document.getElementById("sendBtn").removeAttribute("disabled");
+                        document
+                            .getElementById("sendBtn")
+                            .removeAttribute("disabled");
                     }
                 }
 
@@ -1501,18 +2043,30 @@
                     const ctx = canvas.getContext("2d");
 
                     // Mouse and Touch listeners
-                    canvas.addEventListener("mousedown", (e) => this.startJoystickDrag(e));
-                    window.addEventListener("mousemove", (e) => this.dragJoystick(e));
-                    window.addEventListener("mouseup", (e) => this.endJoystickDrag(e));
+                    canvas.addEventListener("mousedown", (e) =>
+                        this.startJoystickDrag(e),
+                    );
+                    window.addEventListener("mousemove", (e) =>
+                        this.dragJoystick(e),
+                    );
+                    window.addEventListener("mouseup", (e) =>
+                        this.endJoystickDrag(e),
+                    );
 
-                    canvas.addEventListener("touchstart", (e) => {
-                        e.preventDefault();
-                        this.startJoystickDrag(e.touches[0]);
-                    }, { passive: false });
+                    canvas.addEventListener(
+                        "touchstart",
+                        (e) => {
+                            e.preventDefault();
+                            this.startJoystickDrag(e.touches[0]);
+                        },
+                        { passive: false },
+                    );
                     window.addEventListener("touchmove", (e) => {
                         this.dragJoystick(e.touches[0]);
                     });
-                    window.addEventListener("touchend", () => this.endJoystickDrag());
+                    window.addEventListener("touchend", () =>
+                        this.endJoystickDrag(),
+                    );
 
                     this.drawJoystick();
                 }
@@ -1557,23 +2111,38 @@
                     } else {
                         // Constrain handle to outer boundary
                         const angle = Math.atan2(dy, dx);
-                        this.joystickState.currentX = this.joystickState.centerX + Math.cos(angle) * this.joystickState.maxRadius;
-                        this.joystickState.currentY = this.joystickState.centerY + Math.sin(angle) * this.joystickState.maxRadius;
+                        this.joystickState.currentX =
+                            this.joystickState.centerX +
+                            Math.cos(angle) * this.joystickState.maxRadius;
+                        this.joystickState.currentY =
+                            this.joystickState.centerY +
+                            Math.sin(angle) * this.joystickState.maxRadius;
                     }
 
                     // Convert handle coordinates to numerical scales
-                    const rangeScale = parseFloat(document.getElementById("joyScale").value) || 100;
-                    
+                    const rangeScale =
+                        parseFloat(document.getElementById("joyScale").value) ||
+                        100;
+
                     // X-axis: right is positive, left is negative
-                    const rawX = (this.joystickState.currentX - this.joystickState.centerX) / this.joystickState.maxRadius;
+                    const rawX =
+                        (this.joystickState.currentX -
+                            this.joystickState.centerX) /
+                        this.joystickState.maxRadius;
                     // Y-axis: invert so that pushing forward/up is positive, pulling back is negative
-                    const rawY = -(this.joystickState.currentY - this.joystickState.centerY) / this.joystickState.maxRadius;
+                    const rawY =
+                        -(
+                            this.joystickState.currentY -
+                            this.joystickState.centerY
+                        ) / this.joystickState.maxRadius;
 
                     this.joystickState.x = Math.round(rawX * rangeScale);
                     this.joystickState.y = Math.round(rawY * rangeScale);
 
-                    document.getElementById("coordValX").innerText = this.joystickState.x;
-                    document.getElementById("coordValY").innerText = this.joystickState.y;
+                    document.getElementById("coordValX").innerText =
+                        this.joystickState.x;
+                    document.getElementById("coordValY").innerText =
+                        this.joystickState.y;
 
                     this.drawJoystick();
                 }
@@ -1582,11 +2151,14 @@
                     if (!this.joystickState.active) return;
                     this.joystickState.active = false;
 
-                    const returnToCenter = document.getElementById("joyReturnCenter").checked;
-                    
+                    const returnToCenter =
+                        document.getElementById("joyReturnCenter").checked;
+
                     if (returnToCenter) {
-                        this.joystickState.currentX = this.joystickState.centerX;
-                        this.joystickState.currentY = this.joystickState.centerY;
+                        this.joystickState.currentX =
+                            this.joystickState.centerX;
+                        this.joystickState.currentY =
+                            this.joystickState.centerY;
                         this.joystickState.x = 0;
                         this.joystickState.y = 0;
                         document.getElementById("coordValX").innerText = "0";
@@ -1621,9 +2193,15 @@
                 async transmitJoystickState() {
                     if (!this.writer || this.currentGroup === null) return;
 
-                    const xName = document.getElementById("joyXName").value.trim();
-                    const yName = document.getElementById("joyYName").value.trim();
-                    const delimiter = document.getElementById("delimiterSetting").value || ":";
+                    const xName = document
+                        .getElementById("joyXName")
+                        .value.trim();
+                    const yName = document
+                        .getElementById("joyYName")
+                        .value.trim();
+                    const delimiter =
+                        document.getElementById("delimiterSetting").value ||
+                        ":";
 
                     if (xName) {
                         const cmdX = `SEND:${this.currentGroup}:-1:${xName}${delimiter}${this.joystickState.x}\n`;
@@ -1642,7 +2220,13 @@
 
                     // Outer base circle
                     ctx.beginPath();
-                    ctx.arc(this.joystickState.centerX, this.joystickState.centerY, this.joystickState.maxRadius, 0, 2 * Math.PI);
+                    ctx.arc(
+                        this.joystickState.centerX,
+                        this.joystickState.centerY,
+                        this.joystickState.maxRadius,
+                        0,
+                        2 * Math.PI,
+                    );
                     ctx.fillStyle = "#1f2937";
                     ctx.fill();
                     ctx.strokeStyle = "#374151";
@@ -1652,10 +2236,26 @@
                     // Grid crosshairs
                     ctx.beginPath();
                     ctx.setLineDash([4, 4]);
-                    ctx.moveTo(this.joystickState.centerX - this.joystickState.maxRadius, this.joystickState.centerY);
-                    ctx.lineTo(this.joystickState.centerX + this.joystickState.maxRadius, this.joystickState.centerY);
-                    ctx.moveTo(this.joystickState.centerX, this.joystickState.centerY - this.joystickState.maxRadius);
-                    ctx.lineTo(this.joystickState.centerX, this.joystickState.centerY + this.joystickState.maxRadius);
+                    ctx.moveTo(
+                        this.joystickState.centerX -
+                            this.joystickState.maxRadius,
+                        this.joystickState.centerY,
+                    );
+                    ctx.lineTo(
+                        this.joystickState.centerX +
+                            this.joystickState.maxRadius,
+                        this.joystickState.centerY,
+                    );
+                    ctx.moveTo(
+                        this.joystickState.centerX,
+                        this.joystickState.centerY -
+                            this.joystickState.maxRadius,
+                    );
+                    ctx.lineTo(
+                        this.joystickState.centerX,
+                        this.joystickState.centerY +
+                            this.joystickState.maxRadius,
+                    );
                     ctx.strokeStyle = "#4b5563";
                     ctx.lineWidth = 1;
                     ctx.stroke();
@@ -1663,22 +2263,38 @@
 
                     // Glowing drag boundary ring
                     ctx.beginPath();
-                    ctx.arc(this.joystickState.centerX, this.joystickState.centerY, this.joystickState.maxRadius, 0, 2 * Math.PI);
+                    ctx.arc(
+                        this.joystickState.centerX,
+                        this.joystickState.centerY,
+                        this.joystickState.maxRadius,
+                        0,
+                        2 * Math.PI,
+                    );
                     ctx.strokeStyle = "rgba(6, 182, 212, 0.3)";
                     ctx.lineWidth = 2;
                     ctx.stroke();
 
                     // Interactive handle ball
                     ctx.beginPath();
-                    ctx.arc(this.joystickState.currentX, this.joystickState.currentY, this.joystickState.handleRadius, 0, 2 * Math.PI);
-                    
+                    ctx.arc(
+                        this.joystickState.currentX,
+                        this.joystickState.currentY,
+                        this.joystickState.handleRadius,
+                        0,
+                        2 * Math.PI,
+                    );
+
                     const gradient = ctx.createRadialGradient(
-                        this.joystickState.currentX - 5, this.joystickState.currentY - 5, 2,
-                        this.joystickState.currentX, this.joystickState.currentY, this.joystickState.handleRadius
+                        this.joystickState.currentX - 5,
+                        this.joystickState.currentY - 5,
+                        2,
+                        this.joystickState.currentX,
+                        this.joystickState.currentY,
+                        this.joystickState.handleRadius,
                     );
                     gradient.addColorStop(0, "#22d3ee");
                     gradient.addColorStop(1, "#0891b2");
-                    
+
                     ctx.fillStyle = gradient;
                     ctx.shadowColor = "rgba(6, 182, 212, 0.6)";
                     ctx.shadowBlur = this.joystickState.active ? 15 : 6;

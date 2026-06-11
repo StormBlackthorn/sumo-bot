@@ -8,8 +8,7 @@ Global.init({
 
 // Initialize Network
 Network.init()
-
-let isInjecting = false;
+radio.setGroup(Global.radioGroup)
 
 // Process incoming injection commands from the HTML interface
 serial.onDataReceived(serial.delimiters(Delimiters.NewLine), function () {
@@ -23,8 +22,7 @@ serial.onDataReceived(serial.delimiters(Delimiters.NewLine), function () {
             let duration = parseFloat(parts[2])
 
             // Pause the scanner and hop to the target frequency
-            isInjecting = true;
-            Network.RadioSniffer.searching = false;
+            Network.isInjecting = true;
             radio.setGroup(targetGroup)
 
             // Determine if this is a strict Name/Value pair or a raw String/JSON
@@ -68,18 +66,44 @@ serial.onDataReceived(serial.delimiters(Delimiters.NewLine), function () {
 
             // Return to default group and allow the scanner to resume
             radio.setGroup(Global.radioGroup)
-            isInjecting = false;
+            Network.isInjecting = false;
         }
+    } else if (line.includes("SET_GROUP:")) {
+        let parts = line.split(":")
+        if (parts.length >= 2) {
+            let grp = parseFloat(parts[1])
+            if (grp >= 0 && grp <= 255) {
+                // Broadcast synchronization command on the current channel before hopping
+                radio.sendValue("SET_GROUP", grp)
+                radio.sendString("SET_GROUP:" + grp)
+                basic.pause(100) // allow packet to transmit
+
+                Global.radioGroup = grp
+                radio.setGroup(grp)
+                serial.writeLine("SET_GROUP_ACK:" + grp)
+            }
+        }
+    } else if (line.includes("STOP_SCAN")) {
+        Network.RadioSniffer.stopScan()
+    } else if (line.includes("SCAN")) {
+        let parts = line.split(":")
+        let duration = 10000 // default 10s
+        if (parts.length >= 2) {
+            duration = parseFloat(parts[1]) * 1000 // convert seconds to ms
+        }
+        if (Global.deviceType === Global.DEVICE_TYPE.CONTRLLER) {
+            radio.sendString("CMD:START_SCAN:" + duration)
+            basic.pause(50) // wait for transmission
+        }
+        Network.RadioSniffer.startScan(duration)
     }
 })
 
-// Main Background Loop
-basic.forever(function () {
-    if (!isInjecting) {
-        // Runs the 2-second sniffer cycle block
-        Network.RadioSniffer.sniff()
-
-        // Brief pause to allow other system tasks to process before starting the next cycle
-        basic.pause(10)
+input.onLogoEvent(TouchButtonEvent.Pressed, function () {
+    if (Global.deviceType === Global.DEVICE_TYPE.CONTRLLER) {
+        let duration = 1000 // 1 second
+        radio.sendString("CMD:START_SCAN:" + duration)
+        basic.pause(50) // wait for transmission
+        Network.RadioSniffer.startScan(duration)
     }
 })
